@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.me.assumentpark.mapper.ProjectMapper">
+    <update id="update" parameterType="com.me.assumentpark.entity.po.Project">
+        update project
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="beginTime != null">
+                begin_time = #{beginTime},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime},
+            </if>
+            <if test="maxSize != null">
+                max_size = #{maxSize},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="description != null">
+                description = #{description},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+
+    <select id="listByCondition" resultType="com.me.assumentpark.entity.po.Project">
+        select id,name,price,begin_time,end_time,max_size,status,description
+        from project
+        <where>
+            <if test="name != null">
+                and name like concat('%',#{name},'%')
+            </if>
+            <if test="minPrice != null">
+                and price &gt;= #{minPrice}
+            </if>
+            <if test="maxPrice != null">
+                and price &lt;= #{maxPrice}
+            </if>
+            <if test="beginTime != null">
+                and begin_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null">
+                and end_time &lt;= #{endTime}
+            </if>
+            <if test="maxSize != null">
+                and max_size &gt;= #{maxSize}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+
+    
+</mapper>

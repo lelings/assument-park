@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>信息管理系统</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        h2 {
+            color: #666;
+            margin-top: 20px;
+        }
+
+
+
+        input[type="text"],
+        input[type="password"],
+        input[type="number"] {
+            margin: 5px auto;
+        }
+
+        button {
+            display: block;
+            margin: 10px auto;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            width: 100%;
+        }
+
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .left-section {
+            width: 50%;
+            float: left;
+            margin-bottom: 20px;
+            display: block;
+            /* 添加此行 */
+        }
+
+        .right-section {
+            width: 50%;
+            float: right;
+            margin-bottom: 20px;
+            display: block;
+            /* 添加此行 */
+        }
+
+        .bottom-section {
+            width: 100%;
+            align-items: center;
+            text-align: center;
+        }
+
+        .container {
+            overflow: auto;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        // JavaScript代码保持不变
+        function getEmployeeById() {
+            var id = document.getElementById("idInput").value;
+            axios.get("http://localhost:8080/api/employee/" + id)
+                .then(function (response) {
+                    var result = response.data;
+                    if (result.code === 200) {
+                        var employee = result.data;
+                        if (employee.sex === 1) {
+                            employee.sex = '男';
+                        } else {
+                            employee.sex = '女';
+                        }
+                        var resultHtml = "<table><tr>" +
+                            "<td>" + employee.id + "</td>" +
+                            "<td>" + employee.name + "</td>" +
+                            "<td>" + employee.phone + "</td>" +
+                            "<td>" + employee.age + "</td>" +
+                            "<td>" + employee.sex + "</td>" +
+                            "<td>" + employee.salary + "</td>" +
+                            "<td>" + employee.createTime + "</td>" +
+                            "</tr></table>";
+                        document.getElementById("resultBody").innerHTML = resultHtml;
+                    } else {
+                        document.getElementById("resultBody").innerHTML = "<tr><td colspan='6'>" + result.msg + "</td></tr>";
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+
+        function getEmployeeList() {
+            axios.get("http://localhost:8080/api/employee/list")
+                .then(function (response) {
+                    var result = response.data;
+                    if (result.code === 200) {
+                        var employees = result.data;
+                        var resultHtml = "";
+                        for (var i = 0; i < employees.length; i++) {
+                            if (employees[i].sex === 1) {
+                                employees[i].sex = '男';
+                            } else {
+                                employees[i].sex = '女';
+                            }
+                            resultHtml += "<tr>" +
+                                "<td>" + employees[i].id + "</td>" +
+                                "<td>" + employees[i].name + "</td>" +
+                                "<td>" + employees[i].phone + "</td>" +
+                                "<td>" + employees[i].age + "</td>" +
+                                "<td>" + employees[i].sex + "</td>" +
+                                "<td>" + employees[i].salary + "</td>" +
+                                "<td>" + employees[i].createTime + "</td>" +
+                                "</tr>";
+                        }
+                        document.getElementById("resultBody").innerHTML = resultHtml;
+                    } else {
+                        document.getElementById("resultBody").innerHTML = "<tr><td colspan='6'>" + result.msg + "</td></tr>";
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+
+        function getEmployeeByCondition() {
+            var employeeQueryDTO = {
+                name: document.getElementById("queryNameInput").value,
+                minAge: parseInt(document.getElementById("queryMinAgeInput").value),
+                maxAge: parseInt(document.getElementById("queryMaxAgeInput").value),
+                sex: document.getElementById("querySexInput").value,
+                minSalary: parseFloat(document.getElementById("queryMinSalaryInput").value),
+                maxSalary: parseFloat(document.getElementById("queryMaxSalaryInput").value),
+                status: document.getElementById("queryStatusInput").value,
+                minCreateTime: document.getElementById("queryMinCreateTimeInput").value,
+                maxCreateTime: document.getElementById("queryMaxCreateTimeInput").value
+            }
+            if (employeeQueryDTO.sex === '男') {
+                employeeQueryDTO.sex = 1;
+            }else if (employeeQueryDTO === '女'){
+                employeeQueryDTO.sex = 0;
+            }
+            axios.post("http://localhost:8080/api/employee/list",employeeQueryDTO)
+                .then(function (response) {
+                    var result = response.data;
+                    if (result.code === 200) {
+                        var employees = result.data;
+                        var resultHtml = "";
+                        for (var i = 0; i < employees.length; i++) {
+                            if (employees[i].sex === 1) {
+                                employees[i].sex = '男';
+                            } else {
+                                employees[i].sex = '女';
+                            }
+                            var date = new Date(employees[i].createTime);
+                            Y = date.getFullYear() + '-';
+                            M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+                            D = date.getDate() + ' ';
+                            h = date.getHours() + ':';
+                            m = date.getMinutes() + ':';
+                            s = date.getSeconds();
+                            resultHtml += "<tr>" +
+                                "<td>" + employees[i].id + "</td>" +
+                                "<td>" + employees[i].name + "</td>" +
+                                "<td>" + employees[i].phone + "</td>" +
+                                "<td>" + employees[i].age + "</td>" +
+                                "<td>" + employees[i].sex + "</td>" +
+                                "<td>" + employees[i].salary + "</td>" +
+                                "<td>" + Y + M + D + h + m + s + "</td>" +
+                                "</tr>";
+                        }
+                        document.getElementById("resultBody").innerHTML = resultHtml;
+                    }else {
+                        document.getElementById("resultBody").innerHTML = "<tr><td colspan='6'>" + result.msg + "</td></tr>";
+                    }
+                }).catch(function (error) {
+                console.log(error);
+            });
+
+        }
+        function addEmployee() {
+            var employeeDTO = {
+                name: document.getElementById("nameInput").value,
+                phone: document.getElementById("phoneInput").value,
+                password: document.getElementById("passwordInput").value,
+                age: parseInt(document.getElementById("ageInput").value),
+                sex: document.getElementById("sexInput").value,
+                salary: parseFloat(document.getElementById("salaryInput").value)
+            };
+            if (employeeDTO.sex === '男') {
+                employeeDTO.sex = 1;
+            }else if(employeeDTO.sex === '女') {
+                employeeDTO.sex = 0;
+            }
+            axios.post("http://localhost:8080/api/employee", employeeDTO)
+                .then(function (response) {
+                    var result = response.data;
+                    if (result.code === 200) {
+                        getEmployeeList();
+                    } else {
+                        document.getElementById("result").innerHTML = result.msg;
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+
+        function updateEmployee() {
+            var employeeDTO = {
+                id: document.getElementById("updateIdInput").value,
+                name: document.getElementById("updateNameInput").value,
+                password: document.getElementById("updatePasswordInput").value,
+                salary: parseFloat(document.getElementById("updateSalaryInput").value)
+            }
+            axios.put("http://localhost:8080/api/employee",employeeDTO)
+                .then(function (response) {
+                    var result = response.data;
+                    if (result.code === 200) {
+                        getEmployeeList();
+                    } else {
+                        document.getElementById("result").innerHTML = result.msg;
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+
+        function deleteEmployee() {
+            var id = document.getElementById("deleteIdInput").value;
+
+            axios.delete("http://localhost:8080/api/employee/" + id)
+                .then(function (response) {
+                    var result = response.data;
+                    if (result.code === 200) {
+                        getEmployeeList();
+                    } else {
+                        document.getElementById("result").innerHTML = result.msg;
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+    </script>
+</head>
+
+<body>
+<div class="container">
+    <h1>员工信息管理系统</h1>
+    <div class="left-section">
+
+        <h2>根据ID查询员工</h2>
+        <input type="text" id="idInput">
+        <button onclick="getEmployeeById()">查询</button>
+
+        <h2>查询员工列表</h2>
+        <button onclick="getEmployeeList()">查询</button>
+
+        <h2>条件查询员工列表</h2>
+        <input type="text" id="queryNameInput" placeholder="姓名">
+        <input type="number" id="queryMinAgeInput" placeholder="最小年龄">
+        <input type="number" id="queryMaxAgeInput" placeholder="最大年龄">
+        <input type="text" id="querySexInput" placeholder="性别">
+        <input type="number" id="queryMinSalaryInput" placeholder="最低薪水">
+        <input type="number" id="queryMaxSalaryInput" placeholder="最高薪水">
+        <input type="text" id="queryStatusInput" placeholder="状态">
+        <input type="text" id="queryMinCreateTimeInput" placeholder="最小创建时间">
+        <input type="text" id="queryMaxCreateTimeInput" placeholder="最大创建时间">
+        <button onclick="getEmployeeByCondition()">查询</button>
+    </div>
+
+
+    <div class="right-section">
+        <h2>添加员工</h2>
+        <input type="text" id="nameInput" placeholder="姓名">
+        <input type="text" id="phoneInput" placeholder="电话">
+        <input type="password" id="passwordInput" placeholder="密码"><br>
+        <input type="number" id="ageInput" placeholder="年龄">
+        <input type="text" id="sexInput" placeholder="性别">
+        <input type="number" id="salaryInput" placeholder="薪水"><br>
+        <button onclick="addEmployee()">添加</button>
+
+        <h2>修改员工信息</h2>
+        <input type="id" id="updateIdInput" placeholder="员工id">
+        <input type="text" id="updateNameInput" placeholder="姓名">
+        <input type="password" id="updatePasswordInput" placeholder="密码">
+        <input type="number" id="updateSalaryInput" placeholder="薪水">
+        <button onclick="updateEmployee()">修改</button>
+
+        <h2>删除员工</h2>
+        <input type="id" id="deleteIdInput" placeholder="员工id">
+        <button onclick="deleteEmployee()">删除</button>
+    </div>
+
+    <div></div>
+
+</div>
+<div class="bottom-section">
+    <h2>查询结果</h2>
+    <div id="result">
+        <table id="resultTable" class="bottom-section">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>姓名</th>
+                <th>电话</th>
+                <th>年龄</th>
+                <th>性别</th>
+                <th>薪水</th>
+                <th>创建时间</th>
+            </tr>
+            </thead>
+            <tbody id="resultBody"></tbody>
+        </table>
+    </div>
+</div>
+</body>
+
+</html>

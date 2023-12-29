@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.me.assumentpark.mapper.EmployeeMapper">
+    <select id="listByCondition" resultType="com.me.assumentpark.entity.po.Employee">
+        select id,name,phone,password,salary,age,sex,create_time
+        from employee
+        <where>
+            <if test="name != null || name != ''">
+                and name like concat('%',#{name},'%')
+            </if>
+            <if test="minAge != null">
+                and age &gt;= #{minAge}
+            </if>
+            <if test="maxAge != null">
+                and age &lt;= #{maxAge}
+            </if>
+            <if test="sex != null">
+                and sex = #{sex}
+            </if>
+            <if test="minCreateTime != null">
+                and create_time &gt;= #{minCreateTime}
+            </if>
+            <if test="maxCreateTime != null">
+                and create_time &lt;= #{maxCreateTime}
+            </if>
+            <if test="minSalary != null">
+                and salary &gt;= #{minSalary}
+            </if>
+            <if test="maxSalary != null">
+                and salary &lt;= #{maxSalary}
+            </if>
+        </where>
+    </select>
+
+    <update id="update">
+        update employee
+        <set>
+            <if test="name != null || name != ''">
+                name = #{name},
+            </if>
+            <if test="password != null || password != ''">
+                password = #{password},
+            </if>
+            <if test="salary != null">
+                salary = #{salary},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>
